@@ -55,3 +55,5 @@ a{color:var(--acc)}
 [data-theme=light] .btn{color:#fff}
 [data-theme=light] .chip[aria-selected=true]{color:#fff}
 .themebtn{background:transparent;color:var(--text);border:1px solid var(--line);border-radius:99px;padding:5px 14px;cursor:pointer;font:inherit;margin-left:12px}
+#manual label.chk{align-items:flex-start;margin:8px 0;color:var(--text)}#manual label.chk input{margin-top:5px}
+@media print{#manual{break-inside:avoid}}

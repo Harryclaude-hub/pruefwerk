@@ -327,3 +327,30 @@
     $("run").disabled = false;
   });
 })();
+
+/* Manuelle Checkliste: Haken und Entscheidung fuer den Bericht */
+(function () {
+  const $ = id => document.getElementById(id);
+  const ITEMS = [
+    "Person auf dem Foto stimmt mit Selfie oder Videoaufnahme ueberein (Gesicht)",
+    "Foto im Dokument wirkt original: nicht aufgeklebt, ueberdruckt oder verschoben, einheitliche Rasterung",
+    "Unterschrift stimmt mit der Vergleichsunterschrift ueberein (falls vorhanden)",
+    "Hologramm und optisch variable Merkmale: im Video gekippt, Veraenderung sichtbar, Aussehen passt zur PRADO-Beschreibung des Modells",
+    "Schriftart, Abstaende und Layout entsprechen dem amtlichen Muster (PRADO)",
+    "Daten laut Kundenkonto (Name, Geburtsdatum) stimmen mit dem Dokument ueberein",
+    "Bei Karte oder Pass mit Chip: NFC-Auslesung durchgefuehrt und stimmt",
+    "Dokument ist nicht als verloren oder gestohlen gemeldet (falls Abfrage moeglich)"
+  ];
+  const list = $("mlist"); if (!list) return;
+  ITEMS.forEach((t, i) => {
+    const l = document.createElement("label"); l.className = "chk";
+    const c = document.createElement("input"); c.type = "checkbox"; c.id = "m" + i;
+    l.append(c, document.createTextNode(" " + t)); list.append(l);
+  });
+  function sum() {
+    const n = ITEMS.filter((_, i) => $("m" + i).checked).length;
+    $("msum").textContent = "Manuell bestaetigt: " + n + " von " + ITEMS.length + (n < ITEMS.length ? ". Nicht abgehakte Punkte sind offen, nicht automatisch in Ordnung." : ".");
+  }
+  list.addEventListener("change", sum); sum();
+  $("reset").addEventListener("click", () => { setTimeout(() => { ITEMS.forEach((_, i) => $("m" + i).checked = false); $("mdec").value = ""; $("mname").value = ""; $("mnote").value = ""; sum(); }, 0); });
+})();

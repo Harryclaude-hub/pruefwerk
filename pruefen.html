@@ -16,7 +16,7 @@
 <label class="chk"><input id="useocr" type="checkbox" checked> Text im Bild automatisch lesen (OCR, lokal). Das erste Mal dauert etwas.</label>
 <label for="mrz">MRZ-Zeilen (maschinenlesbare Zone unten). Leer lassen: wird per OCR gelesen und hier eingetragen. Bitte danach mit dem Original vergleichen.</label>
 <textarea id="mrz" rows="3" spellcheck="false" autocomplete="off" placeholder="Zeilen hier einfuegen oder abtippen"></textarea>
-<details><summary>Sichtzone zum Abgleich (freiwillig)</summary>
+<details><summary>Daten laut Kundenkonto oder Sichtzone (zum Abgleich mit der MRZ)</summary>
 <div class="row"><div><label for="surname">Nachname</label><input id="surname" autocomplete="off"></div><div><label for="given">Vorname(n)</label><input id="given" autocomplete="off"></div></div>
 <div class="row"><div><label for="docnum">Dokumentnummer</label><input id="docnum" autocomplete="off"></div><div><label for="dob">Geburtsdatum</label><input id="dob" type="date"></div></div>
 <div class="row"><div><label for="issue">Ausstellungsdatum</label><input id="issue" type="date"></div><div><label for="exp">Ablaufdatum</label><input id="exp" type="date"></div></div>
@@ -33,6 +33,13 @@
 <p class="sub">Gestrichelt: erwartete Zonen nach ICAO-Raster (setzt ein eng zugeschnittenes Foto voraus). Rot gefuellt: auffaellige Kompressionsbereiche.</p></div>
 <div id="findings"></div>
 </div>
+<div class="card" id="manual"><h3>Manuelle Pruefung durch Mitarbeiter</h3>
+<p class="sub">Was ein Foto nicht sicher zeigt, haken Menschen ab. Fuer Hologramm und Layout dient das amtliche Register PRADO als Vergleich. Der Stand kommt in den Bericht.</p>
+<div id="mlist"></div>
+<div class="row"><div><label for="mname">Pruefer/in</label><input id="mname" autocomplete="off" maxlength="60"></div>
+<div><label for="mdec">Entscheidung</label><select id="mdec"><option value="">Offen</option><option>Freigegeben</option><option>Weitere Unterlagen angefordert</option><option>Abgelehnt</option></select></div></div>
+<label for="mnote">Notiz</label><textarea id="mnote" rows="2" maxlength="500"></textarea>
+<p id="msum" class="sub" role="status"></p></div>
 <div class="card"><h3>Nicht geprueft (bitte anders absichern)</h3>
 <ul><li>Gesicht und Abgleich mit einem Selfie (Lebenderkennung)</li><li>Hologramme und weitere Sicherheitsmerkmale (auf einem Foto kaum beurteilbar)</li><li>Chip-Auslesung per NFC und Abfrage amtlicher Register</li><li>Laenderspezifische Layout-Pruefung gegen amtliche Muster (PRADO)</li></ul></div>
 <p><button class="btn alt" id="print" type="button">Bericht drucken</button></p>
