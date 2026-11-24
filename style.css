@@ -57,3 +57,5 @@ a{color:var(--acc)}
 .themebtn{background:transparent;color:var(--text);border:1px solid var(--line);border-radius:99px;padding:5px 14px;cursor:pointer;font:inherit;margin-left:12px}
 #manual label.chk{align-items:flex-start;margin:8px 0;color:var(--text)}#manual label.chk input{margin-top:5px}
 @media print{#manual{break-inside:avoid}}
+.flag{width:28px;height:21px;object-fit:cover;border:1px solid var(--line);border-radius:3px;flex:none}
+.row select+.flag{display:block;margin-top:6px}

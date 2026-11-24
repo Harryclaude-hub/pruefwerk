@@ -19,7 +19,8 @@
   function card(c) {
     const d = el("article", "ccard");
     const top = el("div", "ctop");
-    top.append(el("h3", "", c.n), el("span", "code", c.c.replace(/</g, "_")));
+    const im = el("img", "flag"); im.src = "flags/" + c.a.toLowerCase() + ".svg"; im.alt = ""; im.width = 28; im.height = 21; im.loading = "lazy";
+    top.append(im, el("h3", "", c.n), el("span", "code", c.c.replace(/</g, "_")));
     const star = el("button", "star", fav.includes(c.a) ? "★" : "☆"); star.type = "button";
     star.setAttribute("aria-label", (fav.includes(c.a) ? "Favorit entfernen: " : "Als Favorit merken: ") + c.n);
     star.addEventListener("click", () => {

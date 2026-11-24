@@ -24,3 +24,6 @@ Reisepass, ID-Karte, Aufenthaltstitel, Visum (Typ A und B) mit MRZ-Pruefziffern;
 
 ## Bewusst nicht enthalten
 Keine nachgebauten Ausweise oder Muster-Dokumente (Fuer Vergleich: amtliche Muster bei PRADO). Keine Behauptung, Echtheit oder 100 % Sicherheit zu liefern.
+
+## Als App installieren
+Auf der Live-Seite im Browser: Knopf "App installieren" oben rechts oder Browser-Menue > App installieren (Desktop) bzw. Zum Startbildschirm hinzufuegen (Handy; iPhone: Teilen > Zum Home-Bildschirm). Danach auch offline nutzbar. Flaggen: flag-icons 7.6.0 (MIT) in flags/.

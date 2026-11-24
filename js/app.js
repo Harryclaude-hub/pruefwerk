@@ -354,3 +354,15 @@
   list.addEventListener("change", sum); sum();
   $("reset").addEventListener("click", () => { setTimeout(() => { ITEMS.forEach((_, i) => $("m" + i).checked = false); $("mdec").value = ""; $("mname").value = ""; $("mnote").value = ""; sum(); }, 0); });
 })();
+
+/* Flagge neben der Laenderauswahl und im Bericht */
+(function () {
+  const sel = document.getElementById("country"), fl = document.getElementById("flag");
+  if (!sel || !fl) return;
+  const upd = () => {
+    const c = window.COUNTRIES.find(x => x.c === sel.value);
+    fl.src = c ? "flags/" + c.a.toLowerCase() + ".svg" : ""; fl.hidden = !c;
+    const r = document.getElementById("rflag"); if (r) r.src = fl.src;
+  };
+  sel.addEventListener("change", upd); upd();
+})();
