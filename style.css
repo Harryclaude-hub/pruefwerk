@@ -50,3 +50,8 @@ a{color:var(--acc)}
 .sr{position:absolute;left:-9999px}
 .doc-info{max-width:800px}.doc-info p,.doc-info li{color:var(--text)}.toc{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}.toc a{border:1px solid var(--line);border-radius:99px;padding:4px 12px;font-size:.88rem;text-decoration:none}
 .infolink{font-size:.75rem;margin-left:8px;border:1px solid var(--line);border-radius:99px;padding:1px 8px;text-decoration:none}
+[data-theme=light]{--bg:#f4f6fb;--card:#fff;--line:#d3dae8;--text:#14203a;--mute:#566380;--acc:#0a8a74;--ok:#12865a;--info:#2f62c9;--warn:#b86b00;--fail:#c4262c}
+[data-theme=light] input,[data-theme=light] select,[data-theme=light] textarea{background:#fff}
+[data-theme=light] .btn{color:#fff}
+[data-theme=light] .chip[aria-selected=true]{color:#fff}
+.themebtn{background:transparent;color:var(--text);border:1px solid var(--line);border-radius:99px;padding:5px 14px;cursor:pointer;font:inherit;margin-left:12px}
