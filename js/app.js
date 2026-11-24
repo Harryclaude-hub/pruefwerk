@@ -271,7 +271,10 @@
       if (f.got) rows.push(h("p", { class: "r" }, h("b", {}, "Gefunden: "), f.got));
       if (f.why) rows.push(h("p", { class: "r" }, h("b", {}, "Warum auffaellig: "), f.why));
       if (f.adv) rows.push(h("p", { class: "r adv" }, h("b", {}, "Empfehlung: "), f.adv));
-      list.append(h("article", { class: "f " + f.s }, h("h3", {}, h("span", { class: "tag" }, LABEL[f.s]), " " + f.t, h("a", { class: "infolink", href: "info.html#" + infoAnchor(f.t), target: "_blank", rel: "noopener" }, "Info")), rows));
+      const sm = h("summary", {}, h("span", { class: "tag" }, LABEL[f.s]), h("b", {}, f.t), f.got ? h("span", { class: "val" }, f.got.slice(0, 60)) : null);
+      const det = h("details", { class: "f " + f.s }, sm, h("div", { class: "fb" }, rows, h("a", { class: "infolink", href: "info.html#" + infoAnchor(f.t), target: "_blank", rel: "noopener" }, "Info")));
+      if (f.s === "fail" || f.s === "warn") det.setAttribute("open", "");
+      list.append(det);
     });
   }
 
@@ -320,6 +323,7 @@
       $("result").hidden = false;
       $("metaLine").textContent = "Pruefzeit " + now.toISOString().slice(0, 16).replace("T", " ") + " UTC, Land " + (window.COUNTRIES.find(c => c.c === inp.country) || {}).n + ", " + (inp.doc === "passport" ? "Reisepass" : "ID-Karte");
       render(findings);
+      mrzView(mrz);
       (function () {
         const top = findings.reduce((m, f) => RANK[f.s] > RANK[m] ? f.s : m, "ok");
         const ci = window.COUNTRIES.find(c => c.c === inp.country) || {};
@@ -381,3 +385,35 @@
   const upd = () => { if (window.PW_HIST_ID) window.HIST.update(window.PW_HIST_ID, { dec: $("mdec").value, who: $("mname").value.slice(0, 60) }); };
   $("mdec").addEventListener("change", upd); $("mname").addEventListener("input", upd);
 })();
+
+/* MRZ-Zerlegung: Zeilen mit markierten Zeichen und Feldtabelle */
+function mrzView(mrz) {
+  const box = document.getElementById("mrzview"); if (!box) return;
+  box.replaceChildren();
+  const mk = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt !== undefined) e.textContent = txt; return e; };
+  if (!mrz || mrz.problem || !mrz.format) { box.hidden = true; return; }
+  box.hidden = false; box.append(mk("h3", "", "MRZ zerlegt (" + mrz.format + (mrz.kind === "visa" ? ", Visum" : "") + ")"));
+  const cdpos = { TD3: { cd_doc: [1, 9], cd_dob: [1, 19], cd_exp: [1, 27], cd_opt: [1, 42], cd_all: [1, 43] }, TD2: { cd_doc: [1, 9], cd_dob: [1, 19], cd_exp: [1, 27], cd_all: [1, 35] }, TD1: { cd_doc: [0, 14], cd_dob: [1, 6], cd_exp: [1, 14], cd_all: [1, 29] } }[mrz.format];
+  const bad = new Set();
+  mrz.checks.forEach(c => { if (!c.ok && cdpos[c.key]) bad.add(cdpos[c.key][0] + ":" + cdpos[c.key][1]); });
+  const pre = mk("div", "mz");
+  mrz.lines.forEach((ln, li) => {
+    const row = mk("div"); [...ln].forEach((ch, ci) => row.append(mk("span", bad.has(li + ":" + ci) ? "bad" : "", ch))); pre.append(row);
+  });
+  box.append(pre);
+  const f = mrz.fields, fd = d => d ? d.toISOString().slice(0, 10) : "ungueltig";
+  const ck = k => mrz.checks.find(c => c.key === k), us = s => String(s).replace(/</g, "_");
+  const rows = [["Dokumenttyp", us(f.type)], ["Aussteller", us(f.issuer)], ["Name", f.surname + ", " + f.given], ["Dokumentnummer", us(f.docNum), "cd_doc"],
+    ["Staatsangehoerigkeit", us(f.nat)], ["Geburtsdatum", f.dob + " = " + fd(f.dobDate), "cd_dob"], ["Geschlecht", us(f.sex)], ["Ablaufdatum", f.exp + " = " + fd(f.expDate), "cd_exp"],
+    ["Zusatzfeld", us(f.opt), "cd_opt"], ["Gesamt", "ueber alle Felder", "cd_all"]];
+  const t = mk("table", "mt"), hd = mk("tr"); ["Feld", "Wert", "Pruefziffer"].forEach(x => hd.append(mk("th", "", x))); t.append(hd);
+  rows.forEach(([a, b, k]) => {
+    const tr = mk("tr"), c = k && ck(k), td = mk("td");
+    if (c) td.append(mk("span", c.ok ? "okc" : "badc", c.ok ? "\u2713 " + c.found : "\u2717 erwartet " + c.expected.replace("Pruefziffer ", "") + ", gefunden " + c.found.replace("Pruefziffer ", "")));
+    else td.textContent = k ? "-" : "";
+    tr.append(mk("td", "", a), mk("td", "", b), td); t.append(tr);
+  });
+  box.append(t);
+}
+/* Pruefer-Name aus dem Profil vorbelegen */
+(function () { try { const w = localStorage.getItem("pw_who"), n = document.getElementById("mname"); if (w && n && !n.value) n.value = w; } catch (e) {} })();
