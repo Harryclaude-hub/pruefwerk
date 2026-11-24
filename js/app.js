@@ -16,11 +16,16 @@
   (function fillCountries() {
     const sel = $("country"), groups = {};
     window.COUNTRIES.forEach(c => { (groups[c.r] = groups[c.r] || []).push(c); });
-    Object.keys(groups).forEach(r => {
-      const og = h("optgroup", { label: r });
-      groups[r].forEach(c => og.append(h("option", { value: c.c }, c.n + " (" + c.c.replace(/</g, "") + ")")));
+    ["EU", "Europa (ausserhalb EU)", "Nordamerika", "Suedasien", "Weitere"].forEach(r => {
+      const og = h("optgroup", { label: r === "Weitere" ? "Weitere Laender und Gebiete" : r });
+      (groups[r] || []).forEach(c => og.append(h("option", { value: c.c }, c.n + " (" + c.c.replace(/</g, "") + ")")));
       sel.append(og);
     });
+    const q = new URLSearchParams(location.search).get("land");
+    const hit = q && window.COUNTRIES.find(c => c.i === q.toUpperCase());
+    if (hit) sel.value = hit.c;
+    const d = new URLSearchParams(location.search).get("art");
+    if (d && [...$("doc").options].some(o => o.value === d)) $("doc").value = d;
   })();
 
   $("file").addEventListener("change", async e => {
@@ -58,20 +63,33 @@
     const cinfo = window.COUNTRIES.find(c => c.c === inp.country);
 
     /* MRZ */
-    if (mrz.problem) {
-      add(inp.fromOcr ? "warn" : "fail", "Maschinenlesbare Zone (MRZ) nicht lesbar", isPass ? "2 Zeilen mit je 44 Zeichen" : "3 Zeilen mit je 30 Zeichen", mrz.problem,
+    const SPEC = {
+      passport: { fm: ["TD3"], t: ["P"], lbl: "Reisepass: 2 x 44 Zeichen (TD3), beginnt mit P" },
+      id: { fm: ["TD1", "TD2"], t: ["I", "A", "C"], lbl: "ID-Karte: 3 x 30 (TD1) oder 2 x 36 (TD2), beginnt mit I, A oder C" },
+      permit: { fm: ["TD1", "TD2"], t: ["I", "A", "C"], lbl: "Aufenthaltstitel: 3 x 30 (TD1) oder 2 x 36 (TD2)" },
+      visa: { fm: ["TD3", "TD2"], t: ["V"], lbl: "Visum: 2 x 44 (Typ A) oder 2 x 36 (Typ B), beginnt mit V" }
+    }[inp.doc];
+    if (inp.doc === "license") {
+      add("info", "Fuehrerschein hat keine MRZ", "Pruefziffern gibt es nur bei Pass, ID-Karte, Aufenthaltstitel, Visum", "keine MRZ-Pruefung moeglich",
+        "Fuehrerscheine haben keine standardisierte maschinenlesbare Zone mit Pruefziffer. Hier sind nur Datumslogik und Bildhinweise moeglich.", "Zusaetzlich einen Pass oder eine ID-Karte anfordern.", null);
+      const dobL = parseInput(inp.dob), expL = parseInput(inp.exp), issL = parseInput(inp.issue);
+      if (dobL && (dobL > now || years(dobL, now) > 115)) add("fail", "Geburtsdatum unplausibel", "Alter 0 bis 115", fmt(dobL), "Datum in der Zukunft oder unmoegliches Alter.", "Nicht akzeptieren.", null);
+      if (expL && expL < now) add("fail", "Fuehrerschein abgelaufen", "Ablaufdatum in der Zukunft", fmt(expL), "Ein abgelaufenes Dokument ist als Nachweis ungueltig.", "Gueltiges Dokument anfordern.", null);
+      if (issL && expL && issL > expL) add("fail", "Ausstellung nach Ablauf", "Ausstellung vor Ablauf", fmt(issL) + " / " + fmt(expL), "Unmoegliche Datumsfolge.", "Nicht akzeptieren.", null);
+      if (issL && dobL && years(dobL, issL) < 15.9) add("warn", "Ausgestellt vor dem 16. Lebensjahr", "Mindestalter meist 16 bis 18 Jahre", years(dobL, issL).toFixed(1) + " Jahre", "Fuehrerscheine werden praktisch nie vor 16 ausgestellt (je nach Land und Klasse).", "Zweites Dokument anfordern.", null);
+    } else if (mrz.problem) {
+      add(inp.fromOcr ? "warn" : "fail", "Maschinenlesbare Zone (MRZ) nicht lesbar", SPEC.lbl, mrz.problem,
         "Ohne lesbare MRZ koennen Pruefziffern und Felder nicht abgeglichen werden. Oft liegt es an Unschaerfe, Reflexion oder abgeschnittenem Rand.",
         "Bessere Aufnahme der ganzen Seite anfordern, alle MRZ-Zeilen sichtbar, ohne Glanz.", "mrz");
     } else {
       const f = mrz.fields;
-      const expFmt = isPass ? "TD3" : "TD1";
-      if (mrz.format !== expFmt && !(!isPass && mrz.format === "TD2"))
-        add("fail", "MRZ-Format passt nicht zur Dokumentart", isPass ? "Reisepass: TD3 (2 x 44)" : "ID-Karte: TD1 (3 x 30)", "gefunden: " + mrz.format,
+      if (!SPEC.fm.includes(mrz.format))
+        add("fail", "MRZ-Format passt nicht zur Dokumentart", SPEC.lbl, "gefunden: " + mrz.format,
           "Jede Dokumentart hat ein festes MRZ-Format. Eine Abweichung spricht fuer ein falsches Dokument oder eine falsche Angabe.", "Dokumentart pruefen oder Dokument neu anfordern.", "mrz");
       const t0 = f.type[0];
-      if (isPass ? t0 !== "P" : !["I", "A", "C"].includes(t0))
-        add("fail", "Dokumenttyp-Kennung falsch", isPass ? "beginnt mit P" : "beginnt mit I, A oder C", "gefunden: " + f.type.replace(/</g, "_"),
-          "Der erste MRZ-Buchstabe nennt die Dokumentart (P = Pass).", "Anderes Dokument anfordern.", "mrz");
+      if (!SPEC.t.includes(t0))
+        add("fail", "Dokumenttyp-Kennung falsch", "beginnt mit " + SPEC.t.join(", "), "gefunden: " + f.type.replace(/</g, "_"),
+          "Der erste MRZ-Buchstabe nennt die Dokumentart (P = Pass, I/A/C = Karte oder Aufenthaltstitel, V = Visum).", "Anderes Dokument anfordern.", "mrz");
       if (f.issuer !== inp.country)
         add("fail", "Ausstellerland passt nicht zum gewaehlten Land", "Code " + inp.country.replace(/</g, "_") + " (" + (cinfo ? cinfo.n : "?") + ")", "MRZ nennt: " + f.issuer.replace(/</g, "_"),
           "Der Dreibuchstaben-Code des ausstellenden Staates muss zum Land des Dokuments passen. Deutschland verwendet D<<.",
@@ -126,7 +144,7 @@
       const vd = parseInput(inp.dob); if (vd) cmp("Geburtsdatum", fmt(f.dobDate), fmt(vd), f.dobDate && vd.getTime() === f.dobDate.getTime());
       const ve = parseInput(inp.exp); if (ve) cmp("Ablaufdatum", fmt(f.expDate), fmt(ve), f.expDate && ve.getTime() === f.expDate.getTime());
     }
-    if (!isPass && cinfo && cinfo.noIdMrz)
+    if (inp.doc === "id" && cinfo && cinfo.noIdMrz)
       add("info", "Land stellt diesen Typ ueblicherweise nicht mit MRZ aus", "ID-Karte mit MRZ", cinfo.n,
         "Fuer dieses Land ist eine nationale ID-Karte mit MRZ ungewoehnlich.", "Reisepass anfordern.", null);
 
@@ -226,6 +244,17 @@
     box(Z.mrz, worst("mrz"), "Erwartete MRZ-Zone: " + LABEL[worst("mrz")]);
     box(Z.photo, "info", "Erwartete Fotozone (Gesicht nicht geprueft)");
   }
+  function infoAnchor(t) {
+    if (/Pruefziffer/.test(t)) return "cd";
+    if (/Ausstellerland|Staatsangeh/.test(t)) return "land";
+    if (/MRZ|Format|Dokumenttyp|Fuehrerschein hat/.test(t)) return "mrz";
+    if (/Datum|abgelaufen|Ablauf|Gueltigkeit|Ausstellung|Laeuft|Alter/.test(t)) return "datum";
+    if (/im Bild|Nachname|Vorname|Dokumentnummer|Texterkennung/.test(t)) return "ocr";
+    if (/Aufloesung|unscharf|Reflexion|dunkel/.test(t)) return "bildqualitaet";
+    if (/Kompression/.test(t)) return "ela";
+    if (/Bearbeitung|KI-|Kamera|JPG/.test(t)) return "datei";
+    return "nicht";
+  }
   function render(findings, canvasFmt) {
     const top = findings.reduce((m, f) => RANK[f.s] > RANK[m] ? f.s : m, "ok");
     const ban = $("banner");
@@ -242,7 +271,7 @@
       if (f.got) rows.push(h("p", { class: "r" }, h("b", {}, "Gefunden: "), f.got));
       if (f.why) rows.push(h("p", { class: "r" }, h("b", {}, "Warum auffaellig: "), f.why));
       if (f.adv) rows.push(h("p", { class: "r adv" }, h("b", {}, "Empfehlung: "), f.adv));
-      list.append(h("article", { class: "f " + f.s }, h("h3", {}, h("span", { class: "tag" }, LABEL[f.s]), " " + f.t), rows));
+      list.append(h("article", { class: "f " + f.s }, h("h3", {}, h("span", { class: "tag" }, LABEL[f.s]), " " + f.t, h("a", { class: "infolink", href: "info.html#" + infoAnchor(f.t), target: "_blank", rel: "noopener" }, "Info")), rows));
     });
   }
 
@@ -253,7 +282,7 @@
       surname: $("surname").value.trim(), given: $("given").value.trim(), docnum: $("docnum").value.trim(),
       dob: $("dob").value, exp: $("exp").value, issue: $("issue").value
     };
-    if (!inp.mrz.trim() && !state.bmp) { $("err").textContent = "Bitte ein Bild laden oder die MRZ-Zeilen eintragen."; return; }
+    if (!inp.mrz.trim() && !state.bmp && !(inp.doc === "license" && (inp.dob || inp.exp || inp.issue))) { $("err").textContent = "Bitte ein Bild laden oder die MRZ-Zeilen eintragen."; return; }
     $("run").disabled = true;
     try {
       const now = new Date();
@@ -265,10 +294,11 @@
         work.getContext("2d").drawImage(state.bmp, 0, 0, W, H);
       }
       const onStatus = (s, p) => { st.textContent = "Texterkennung: " + s + (p ? " " + Math.round(p * 100) + " %" : ""); };
-      if (ocrOn && !inp.mrz.trim()) {
+      if (ocrOn && !inp.mrz.trim() && inp.doc !== "license") {
         st.textContent = "Texterkennung startet (erstes Mal bis ca. 30 Sekunden)...";
-        const nl = inp.doc === "passport" ? 2 : 3;
-        const Z0 = zones(inp.doc === "passport" ? "TD3" : "TD1");
+        const two = inp.doc === "passport" || inp.doc === "visa";
+        const nl = two ? 2 : 3;
+        const Z0 = zones(two ? "TD3" : "TD1");
         inp.mrz = await window.OCR.readMrz(work, Z0.mrz, nl, onStatus);
         $("mrz").value = inp.mrz; mrzFromOcr = !!inp.mrz; inp.fromOcr = mrzFromOcr;
       }
@@ -280,7 +310,7 @@
       const findings = evaluate(inp, mrz, img, now);
       let boxes = [];
       if (mrzFromOcr) findings.push({ s: "info", t: "MRZ wurde per Texterkennung gelesen", exp: "exakte Zeichen wie im Dokument", got: "OCR-Ergebnis, Lesefehler moeglich", why: "OCR verwechselt gern O/0, I/1 und das Zeichen <. Ein Lesefehler kann eine falsche Pruefziffer ausloesen.", adv: "Zeilen im Feld mit dem Original vergleichen, korrigieren und erneut pruefen.", zone: "mrz" });
-      if (ocrOn && !mrz.problem) {
+      if (ocrOn && !mrz.problem && inp.doc !== "license") {
         st.textContent = "Texterkennung liest die Sichtzone...";
         const o = await window.OCR.readText(work, onStatus);
         const r = matchFields(mrz.fields, o);

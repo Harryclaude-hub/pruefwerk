@@ -69,10 +69,14 @@
       cdCheck("cd_doc", "Pruefziffer Dokumentnummer", l2.slice(0, 9), l2[9]);
       cdCheck("cd_dob", "Pruefziffer Geburtsdatum", l2.slice(13, 19), l2[19]);
       cdCheck("cd_exp", "Pruefziffer Ablaufdatum", l2.slice(21, 27), l2[27]);
-      const optEmpty = /^<*$/.test(f.opt);
-      if (optEmpty) add("cd_opt", "Pruefziffer Zusatzfeld", l2[42] === "<" || l2[42] === "0", "< oder 0 bei leerem Feld", l2[42]);
-      else cdCheck("cd_opt", "Pruefziffer Zusatzfeld", f.opt, l2[42]);
-      cdCheck("cd_all", "Gesamt-Pruefziffer", l2.slice(0, 10) + l2.slice(13, 20) + l2.slice(21, 43), l2[43]);
+      if (l1[0] === "V") { /* Visum Typ A: kein Gesamt-Pruefziffer, Zusatzfeld 16 Zeichen */
+        out.kind = "visa"; f.opt = l2.slice(28, 44);
+      } else {
+        const optEmpty = /^<*$/.test(f.opt);
+        if (optEmpty) add("cd_opt", "Pruefziffer Zusatzfeld", l2[42] === "<" || l2[42] === "0", "< oder 0 bei leerem Feld", l2[42]);
+        else cdCheck("cd_opt", "Pruefziffer Zusatzfeld", f.opt, l2[42]);
+        cdCheck("cd_all", "Gesamt-Pruefziffer", l2.slice(0, 10) + l2.slice(13, 20) + l2.slice(21, 43), l2[43]);
+      }
     } else if (out.format === "TD1") {
       f = { type: l1.slice(0, 2), issuer: l1.slice(2, 5), docNum: l1.slice(5, 14), opt: l1.slice(15, 30),
         dob: l2.slice(0, 6), sex: l2[7], exp: l2.slice(8, 14), nat: l2.slice(15, 18) };
@@ -88,7 +92,8 @@
       cdCheck("cd_doc", "Pruefziffer Dokumentnummer", l2.slice(0, 9), l2[9]);
       cdCheck("cd_dob", "Pruefziffer Geburtsdatum", l2.slice(13, 19), l2[19]);
       cdCheck("cd_exp", "Pruefziffer Ablaufdatum", l2.slice(21, 27), l2[27]);
-      cdCheck("cd_all", "Gesamt-Pruefziffer", l2.slice(0, 10) + l2.slice(13, 20) + l2.slice(21, 35), l2[35]);
+      if (l1[0] === "V") { out.kind = "visa"; f.opt = l2.slice(28, 36); } /* Visum Typ B: 8 Zeichen Zusatzfeld, keine Gesamt-Pruefziffer */
+      else cdCheck("cd_all", "Gesamt-Pruefziffer", l2.slice(0, 10) + l2.slice(13, 20) + l2.slice(21, 35), l2[35]);
     }
     const n = names(nameStr);
     f.surname = n.sur; f.given = n.giv;

@@ -1,42 +1,28 @@
 <!doctype html>
 <html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self'; style-src 'self'; img-src 'self' blob: data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="robots" content="noindex">
-<title>Pruefwerk: Ausweis-Plausibilitaetspruefung</title>
+<title>Pruefwerk: Start</title>
 <link rel="stylesheet" href="style.css"></head><body>
-<header class="top"><strong>Pruef<b>werk</b></strong><span>Ausweis-Plausibilitaetspruefung fuer Unternehmen</span></header>
+<header class="top"><a class="brand" href="index.html"><strong>Pruef<b>werk</b></strong></a><span>Ausweis-Plausibilitaetspruefung fuer Unternehmen</span><nav><a href="pruefen.html">Ausweis pruefen</a><a href="info.html">Info: was wird geprueft</a></nav></header>
 <main>
-<p class="note">Nur fuer die pruefende Firma. Lokal im Browser, es wird nichts hochgeladen oder gespeichert. Das Ergebnis ist ein Risikohinweis mit Gruenden, kein Urteil ueber Echtheit. Die Person, deren Ausweis geprueft wird, bekommt diesen Bericht nicht.</p>
-<form id="form" class="card">
-<div class="row">
-<div><label for="country">Land des Dokuments</label><select id="country"></select></div>
-<div><label for="doc">Dokumentart</label><select id="doc"><option value="passport">Reisepass</option><option value="id">ID-Karte</option></select></div>
+<h1>Was moechtest du tun?</h1>
+<div class="tiles">
+<a class="tile" href="pruefen.html"><b>Ausweis pruefen</b><span>Foto hochladen oder Daten eintippen. Pruefziffern, Datumslogik, Bildhinweise, Bericht.</span></a>
+<a class="tile" href="#laender"><b>Land waehlen</b><span>Alle Staaten durchsuchen, Favoriten markieren und direkt mit der passenden Dokumentart starten.</span></a>
+<a class="tile" href="info.html"><b>Info: was wird geprueft?</b><span>Erklaerung jeder Pruefung und ihrer Grenzen, fuer dich und deine Kundschaft.</span></a>
 </div>
-<label for="file">Foto des Ausweises (JPG, PNG, WebP)</label><input id="file" type="file" accept="image/jpeg,image/png,image/webp"><p id="fileinfo" class="sub" role="status"></p>
-<label class="chk"><input id="useocr" type="checkbox" checked> Text im Bild automatisch lesen (OCR, lokal). Das erste Mal dauert etwas.</label>
-<label for="mrz">MRZ-Zeilen (maschinenlesbare Zone unten). Leer lassen: wird per OCR gelesen und hier eingetragen. Bitte danach mit dem Original vergleichen.</label>
-<textarea id="mrz" rows="3" spellcheck="false" autocomplete="off" placeholder="Zeilen hier einfuegen oder abtippen"></textarea>
-<details><summary>Sichtzone zum Abgleich (freiwillig)</summary>
-<div class="row"><div><label for="surname">Nachname</label><input id="surname" autocomplete="off"></div><div><label for="given">Vorname(n)</label><input id="given" autocomplete="off"></div></div>
-<div class="row"><div><label for="docnum">Dokumentnummer</label><input id="docnum" autocomplete="off"></div><div><label for="dob">Geburtsdatum</label><input id="dob" type="date"></div></div>
-<div class="row"><div><label for="issue">Ausstellungsdatum</label><input id="issue" type="date"></div><div><label for="exp">Ablaufdatum</label><input id="exp" type="date"></div></div>
-</details>
-<p><button class="btn" id="run" type="button">Pruefen</button> <button class="btn alt" id="reset" type="button">Leeren</button></p>
-<p id="status" class="sub" role="status"></p><p id="err" class="err" role="alert"></p>
-</form>
+<p class="note">Nur fuer die pruefende Firma. Lokal im Browser, nichts wird hochgeladen. Ergebnis ist ein Risikohinweis mit Gruenden, kein Urteil ueber Echtheit. Amtliche Muster echter Dokumente (zum Vergleich) gibt es beim EU-Register <a href="https://www.consilium.europa.eu/prado/en/prado-start-page.html" rel="noopener noreferrer" target="_blank">PRADO</a>; Pruefwerk zeigt bewusst keine nachgebauten Ausweise.</p>
 
-<section id="result" hidden>
-<div id="banner" class="banner" role="status"></div>
-<p id="summary" class="sub"></p><p id="metaLine" class="sub"></p>
-<div class="two">
-<div class="card"><canvas id="overlay" hidden aria-label="Ausweisfoto mit Markierungen"></canvas>
-<p class="sub">Gestrichelt: erwartete Zonen nach ICAO-Raster (setzt ein eng zugeschnittenes Foto voraus). Rot gefuellt: auffaellige Kompressionsbereiche.</p></div>
-<div id="findings"></div>
+<section id="laender">
+<h2>Laender</h2>
+<div class="bar">
+<label class="sr" for="q">Land suchen</label><input id="q" type="search" placeholder="Land suchen, zum Beispiel Indien" autocomplete="off">
+<div class="chips" id="chips" role="tablist" aria-label="Gruppe"></div>
 </div>
-<div class="card"><h3>Nicht geprueft (bitte anders absichern)</h3>
-<ul><li>Gesicht und Abgleich mit einem Selfie (Lebenderkennung)</li><li>Hologramme und weitere Sicherheitsmerkmale (auf einem Foto kaum beurteilbar)</li><li>Chip-Auslesung per NFC und Abfrage amtlicher Register</li><li>Laenderspezifische Layout-Pruefung gegen amtliche Muster (PRADO)</li></ul></div>
-<p><button class="btn alt" id="print" type="button">Bericht drucken</button></p>
+<p id="count" class="sub" role="status"></p>
+<div id="grid" class="cgrid"></div>
 </section>
 </main>
-<script src="vendor/tesseract.min.js"></script><script src="js/ocr.js"></script><script src="js/countries.js"></script><script src="js/mrz.js"></script><script src="js/forensics.js"></script><script src="js/app.js"></script>
+<script src="js/countries.js"></script><script src="js/start.js"></script>
 </body></html>
