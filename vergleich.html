@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' blob: data:; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="robots" content="noindex">
+<title>Pruefwerk: Vergleichs-Werkbank</title>
+<link rel="stylesheet" href="style.css"><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0e1424"><link rel="apple-touch-icon" href="icons/icon-180.png"><script src="js/theme.js"></script><script src="js/pwa.js"></script></head><body>
+<header class="top"><a class="brand" href="index.html"><strong>Pruef<b>werk</b></strong></a><span>Vergleichs-Werkbank</span><nav><a href="index.html">Kommandozentrum</a><a href="pruefen.html">Ausweis pruefen</a><a href="info.html">Info</a></nav></header>
+<main>
+<p class="note">Fuer Mitarbeiter: Das Kundenbild links, ein <b>amtliches Muster</b> rechts, beide gleichzeitig zoomen. So vergleichst du Schriftart, Abstaende, Foto-Raster und Layout von Hand. Das Muster holst du selbst vom EU-Register <a href="https://www.consilium.europa.eu/prado/en/prado-start-page.html" target="_blank" rel="noopener noreferrer">PRADO</a> oder von der ausstellenden Behoerde und laedst es hier hoch. Pruefwerk erzeugt selbst keine Hologramme oder Muster: Hologramme und Deepfakes beurteilt man im Video beim Kippen des Dokuments, nicht auf einem Standbild. Nichts wird hochgeladen.</p>
+<div class="card">
+<div class="ctl">
+<div><label for="fa">Kundenbild</label><input id="fa" type="file" accept="image/jpeg,image/png,image/webp"></div>
+<div><label for="fb">Amtliches Muster</label><input id="fb" type="file" accept="image/jpeg,image/png,image/webp"></div>
+<div><label for="mode">Ansicht</label><select id="mode"><option value="side">Nebeneinander</option><option value="blend">Ueberblenden</option><option value="diff">Differenz</option><option value="ela">Kunde als Kompressionskarte</option></select></div>
+<div><label for="op">Ueberblenden: Kunde sichtbar</label><input id="op" type="range" min="0" max="100" value="50"></div>
+<div><label for="zoom">Zoom</label><input id="zoom" type="range" min="1" max="12" step="0.1" value="1"></div>
+<label class="chk"><input id="grid" type="checkbox"> Raster</label>
+<button class="btn alt" id="rv" type="button">Ansicht zuruecksetzen</button>
+<button class="btn" id="cap" type="button">Ausschnitt merken</button>
+</div>
+<p id="msg" class="sub" role="status">Beide Bilder laden. Mausrad zoomt, Ziehen verschiebt, beide Bilder bewegen sich gemeinsam (gleicher Bildausschnitt in Prozent).</p>
+<div class="wb" id="wb">
+<figure id="fgA"><figcaption>Kundenbild</figcaption><canvas id="cA" width="800" height="600" aria-label="Kundenbild"></canvas></figure>
+<figure id="fgB"><figcaption>Amtliches Muster</figcaption><canvas id="cB" width="800" height="600" aria-label="Amtliches Muster"></canvas></figure>
+<figure id="fgR" hidden><figcaption id="rcap">Ueberlagerung</figcaption><canvas id="cR" width="800" height="600" aria-label="Ueberlagerung"></canvas></figure>
+</div>
+</div>
+<div class="card"><h3>Gemerkte Ausschnitte (Schrift, Foto, Zeilen)</h3>
+<p class="sub">Zoome auf den Namen oder die MRZ, druecke "Ausschnitt merken". So stehen Kunde und Muster Zeile fuer Zeile untereinander.</p>
+<div id="gal"></div><p><button class="btn alt" id="prt" type="button">Drucken</button></p></div>
+</main>
+<script src="js/vergleich.js"></script>
+</body></html>

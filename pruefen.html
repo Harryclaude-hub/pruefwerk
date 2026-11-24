@@ -4,7 +4,7 @@
 <meta name="robots" content="noindex">
 <title>Pruefwerk: Ausweis-Plausibilitaetspruefung</title>
 <link rel="stylesheet" href="style.css"><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0e1424"><link rel="apple-touch-icon" href="icons/icon-180.png"><script src="js/theme.js"></script><script src="js/pwa.js"></script></head><body>
-<header class="top"><a class="brand" href="index.html"><strong>Pruef<b>werk</b></strong></a><span>Ausweis pruefen</span><nav><a href="index.html">Start</a><a href="info.html">Info: was wird geprueft</a></nav></header>
+<header class="top"><a class="brand" href="index.html"><strong>Pruef<b>werk</b></strong></a><span>Ausweis pruefen</span><nav><a href="index.html">Kommandozentrum</a><a href="vergleich.html">Vergleichs-Werkbank</a><a href="info.html">Info: was wird geprueft</a></nav></header>
 <main>
 <p class="note">Nur fuer die pruefende Firma. Lokal im Browser, es wird nichts hochgeladen oder gespeichert. Das Ergebnis ist ein Risikohinweis mit Gruenden, kein Urteil ueber Echtheit. Die Person, deren Ausweis geprueft wird, bekommt diesen Bericht nicht.</p>
 <form id="form" class="card">
@@ -13,6 +13,7 @@
 <div><label for="doc">Dokumentart</label><select id="doc"><option value="passport">Reisepass</option><option value="id">ID-Karte (Personalausweis)</option><option value="permit">Aufenthaltstitel</option><option value="visa">Visum</option><option value="license">Fuehrerschein (ohne MRZ)</option></select></div>
 </div>
 <label for="file">Foto des Ausweises (JPG, PNG, WebP)</label><input id="file" type="file" accept="image/jpeg,image/png,image/webp"><p id="fileinfo" class="sub" role="status"></p>
+<label for="caseid">Fallnummer (optional, keine Namen oder Ausweisnummern)</label><input id="caseid" maxlength="40" autocomplete="off">
 <label class="chk"><input id="useocr" type="checkbox" checked> Text im Bild automatisch lesen (OCR, lokal). Das erste Mal dauert etwas.</label>
 <label for="mrz">MRZ-Zeilen (maschinenlesbare Zone unten). Leer lassen: wird per OCR gelesen und hier eingetragen. Bitte danach mit dem Original vergleichen.</label>
 <textarea id="mrz" rows="3" spellcheck="false" autocomplete="off" placeholder="Zeilen hier einfuegen oder abtippen"></textarea>
@@ -45,5 +46,5 @@
 <p><button class="btn alt" id="print" type="button">Bericht drucken</button></p>
 </section>
 </main>
-<script src="vendor/tesseract.min.js"></script><script src="js/ocr.js"></script><script src="js/countries.js"></script><script src="js/mrz.js"></script><script src="js/forensics.js"></script><script src="js/app.js"></script>
+<script src="js/hist.js"></script><script src="vendor/tesseract.min.js"></script><script src="js/ocr.js"></script><script src="js/countries.js"></script><script src="js/mrz.js"></script><script src="js/forensics.js"></script><script src="js/app.js"></script>
 </body></html>

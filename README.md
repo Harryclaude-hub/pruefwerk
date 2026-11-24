@@ -27,3 +27,6 @@ Keine nachgebauten Ausweise oder Muster-Dokumente (Fuer Vergleich: amtliche Must
 
 ## Als App installieren
 Auf der Live-Seite im Browser: Knopf "App installieren" oben rechts oder Browser-Menue > App installieren (Desktop) bzw. Zum Startbildschirm hinzufuegen (Handy; iPhone: Teilen > Zum Home-Bildschirm). Danach auch offline nutzbar. Flaggen: flag-icons 7.6.0 (MIT) in flags/.
+
+## Kommandozentrum, Verlauf, Werkbank
+`index.html`: Laender links, Arbeitsflaeche rechts (Land, Verlauf, Werkzeuge). Verlauf lokal gespeichert (ohne Bilder, Namen, Ausweisnummern), CSV-Export. `vergleich.html`: Kundenbild neben amtlichem Muster (selbst hochgeladen, z. B. aus PRADO), gemeinsamer Zoom, Ueberblenden, Differenz, Kompressionskarte, Ausschnitte fuer Schriftvergleich. Das Programm erzeugt selbst keine Hologramme oder Ausweismuster.

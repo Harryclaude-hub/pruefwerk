@@ -320,6 +320,13 @@
       $("result").hidden = false;
       $("metaLine").textContent = "Pruefzeit " + now.toISOString().slice(0, 16).replace("T", " ") + " UTC, Land " + (window.COUNTRIES.find(c => c.c === inp.country) || {}).n + ", " + (inp.doc === "passport" ? "Reisepass" : "ID-Karte");
       render(findings);
+      (function () {
+        const top = findings.reduce((m, f) => RANK[f.s] > RANK[m] ? f.s : m, "ok");
+        const ci = window.COUNTRIES.find(c => c.c === inp.country) || {};
+        window.PW_HIST_ID = window.HIST.add({ t: now.toISOString(), a: ci.a, cn: ci.n, doc: inp.doc, top: top === "info" ? "ok" : top,
+          fail: findings.filter(f => f.s === "fail").length, warn: findings.filter(f => f.s === "warn").length,
+          caseId: ($("caseid").value || "").slice(0, 40), dec: $("mdec").value, who: $("mname").value.slice(0, 60) });
+      })();
       cv.hidden = !state.bmp;
       if (work) drawOverlay(cv, img, work, mrz.format || (inp.doc === "passport" ? "TD3" : "TD1"), findings, boxes);
       $("result").scrollIntoView({ behavior: "smooth" });
@@ -365,4 +372,12 @@
     const r = document.getElementById("rflag"); if (r) r.src = fl.src;
   };
   sel.addEventListener("change", upd); upd();
+})();
+
+/* Entscheidung und Pruefer in den Verlauf schreiben */
+(function () {
+  const $ = id => document.getElementById(id);
+  if (!$("mdec")) return;
+  const upd = () => { if (window.PW_HIST_ID) window.HIST.update(window.PW_HIST_ID, { dec: $("mdec").value, who: $("mname").value.slice(0, 60) }); };
+  $("mdec").addEventListener("change", upd); $("mname").addEventListener("input", upd);
 })();

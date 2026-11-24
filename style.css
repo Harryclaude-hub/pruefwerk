@@ -59,3 +59,31 @@ a{color:var(--acc)}
 @media print{#manual{break-inside:avoid}}
 .flag{width:28px;height:21px;object-fit:cover;border:1px solid var(--line);border-radius:3px;flex:none}
 .row select+.flag{display:block;margin-top:6px}
+/* Kommandozentrum */
+.cc{display:grid;grid-template-columns:320px 1fr;gap:16px;max-width:1400px;margin:0 auto;padding:16px 20px 60px;align-items:start}
+@media(max-width:860px){.cc{grid-template-columns:1fr}}
+.cc-left{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;position:sticky;top:8px}
+@media(max-width:860px){.cc-left{position:static}}
+.cc-left input,.cc-left select{margin-bottom:8px}
+.clist{list-style:none;margin:0;padding:0;max-height:62vh;overflow:auto}
+.crow{display:flex;align-items:center;border-radius:8px}.crow.on{background:rgba(45,226,192,.12);outline:1px solid var(--acc)}
+.cbtn{flex:1;display:flex;align-items:center;gap:10px;background:none;border:0;color:var(--text);text-align:left;padding:7px 8px;cursor:pointer;font:inherit}
+.cbtn .cn{flex:1}.crow:hover{background:rgba(127,127,127,.12)}
+.cc-right{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;min-height:60vh}
+.tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.tabs button{background:transparent;color:var(--mute);border:1px solid var(--line);padding:8px 16px;border-radius:10px;cursor:pointer;font:inherit}
+.tabs button[aria-selected=true]{background:var(--acc);color:#04251f;border-color:var(--acc);font-weight:700}
+[data-theme=light] .tabs button[aria-selected=true]{color:#fff}
+.pane[hidden]{display:none}
+.lhead{display:flex;align-items:center;gap:14px;flex-wrap:wrap}.lhead h2{margin:0}.lhead .flag{width:56px;height:42px}
+.docbtn.big{padding:9px 16px;font-size:.95rem}
+.ht{width:100%;border-collapse:collapse;font-size:.9rem}.ht th,.ht td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:middle}.ht th{color:var(--mute);font-weight:600}
+.tag.ok{background:var(--ok)}.tag.warn{background:var(--warn)}.tag.fail{background:var(--fail)}
+/* Werkbank */
+.wb{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:860px){.wb{grid-template-columns:1fr}}
+.wb canvas{width:100%;height:auto;aspect-ratio:4/3;background:#000;cursor:grab;touch-action:none;border:1px solid var(--line)}
+.wb figure{margin:0}.wb figcaption{color:var(--mute);font-size:.85rem;margin-bottom:4px}
+.ctl{display:flex;gap:14px;flex-wrap:wrap;align-items:end;margin:12px 0}.ctl>div{min-width:160px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px;margin-bottom:10px}.pair canvas{width:100%;height:auto;aspect-ratio:auto}
+.pair .cap{grid-column:1/-1;display:flex;gap:8px;align-items:center}.pair input{flex:1}

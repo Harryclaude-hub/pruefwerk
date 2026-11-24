@@ -2,27 +2,22 @@
 <html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="robots" content="noindex">
-<title>Pruefwerk: Start</title>
+<title>Pruefwerk: Kommandozentrum</title>
 <link rel="stylesheet" href="style.css"><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0e1424"><link rel="apple-touch-icon" href="icons/icon-180.png"><script src="js/theme.js"></script><script src="js/pwa.js"></script></head><body>
-<header class="top"><a class="brand" href="index.html"><strong>Pruef<b>werk</b></strong></a><span>Ausweis-Plausibilitaetspruefung fuer Unternehmen</span><nav><a href="pruefen.html">Ausweis pruefen</a><a href="info.html">Info: was wird geprueft</a></nav></header>
-<main>
-<h1>Was moechtest du tun?</h1>
-<div class="tiles">
-<a class="tile" href="pruefen.html"><b>Ausweis pruefen</b><span>Foto hochladen oder Daten eintippen. Pruefziffern, Datumslogik, Bildhinweise, Bericht.</span></a>
-<a class="tile" href="#laender"><b>Land waehlen</b><span>Alle Staaten durchsuchen, Favoriten markieren und direkt mit der passenden Dokumentart starten.</span></a>
-<a class="tile" href="info.html"><b>Info: was wird geprueft?</b><span>Erklaerung jeder Pruefung und ihrer Grenzen, fuer dich und deine Kundschaft.</span></a>
-</div>
-<p class="note">Nur fuer die pruefende Firma. Lokal im Browser, nichts wird hochgeladen. Ergebnis ist ein Risikohinweis mit Gruenden, kein Urteil ueber Echtheit. Amtliche Muster echter Dokumente (zum Vergleich) gibt es beim EU-Register <a href="https://www.consilium.europa.eu/prado/en/prado-start-page.html" rel="noopener noreferrer" target="_blank">PRADO</a>; Pruefwerk zeigt bewusst keine nachgebauten Ausweise.</p>
-
-<section id="laender">
-<h2>Laender</h2>
-<div class="bar">
-<label class="sr" for="q">Land suchen</label><input id="q" type="search" placeholder="Land suchen, zum Beispiel Indien" autocomplete="off">
-<div class="chips" id="chips" role="tablist" aria-label="Gruppe"></div>
-</div>
+<header class="top"><a class="brand" href="index.html"><strong>Pruef<b>werk</b></strong></a><span>Kommandozentrum</span><nav><a href="pruefen.html">Ausweis pruefen</a><a href="vergleich.html">Vergleichs-Werkbank</a><a href="info.html">Info</a></nav></header>
+<div class="cc">
+<aside class="cc-left" aria-label="Laender">
+<label class="sr" for="q">Land suchen</label><input id="q" type="search" placeholder="Land suchen" autocomplete="off">
+<label class="sr" for="grp">Gruppe</label><select id="grp"></select>
 <p id="count" class="sub" role="status"></p>
-<div id="grid" class="cgrid"></div>
+<ul id="list" class="clist"></ul>
+</aside>
+<section class="cc-right">
+<div class="tabs" role="tablist" id="tabs"></div>
+<div id="p-land" class="pane"></div>
+<div id="p-hist" class="pane" hidden></div>
+<div id="p-tools" class="pane" hidden></div>
 </section>
-</main>
-<script src="js/countries.js"></script><script src="js/start.js"></script>
+</div>
+<script src="js/countries.js"></script><script src="js/hist.js"></script><script src="js/start.js"></script>
 </body></html>

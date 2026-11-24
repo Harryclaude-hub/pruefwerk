@@ -1,7 +1,7 @@
 /* Offline-Speicher: laedt die App einmal und haelt sie bereit. Nur eigene Dateien, nichts von Dritten. */
-const V = "pw-v1";
-const CORE = ["./", "index.html", "pruefen.html", "info.html", "style.css", "manifest.json",
-  "js/theme.js", "js/pwa.js", "js/countries.js", "js/start.js", "js/mrz.js", "js/forensics.js", "js/ocr.js", "js/app.js",
+const V = "pw-v2";
+const CORE = ["./", "index.html", "pruefen.html", "info.html", "vergleich.html", "style.css", "manifest.json",
+  "js/theme.js", "js/pwa.js", "js/countries.js", "js/start.js", "js/hist.js", "js/vergleich.js", "js/mrz.js", "js/forensics.js", "js/ocr.js", "js/app.js",
   "vendor/tesseract.min.js", "vendor/worker.min.js", "vendor/tesseract-core-simd-lstm.wasm.js", "vendor/tesseract-core-lstm.wasm.js",
   "vendor/lang/eng.traineddata.gz", "icons/icon-192.png", "icons/icon-512.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(V).then(c => c.addAll(CORE)).then(() => self.skipWaiting())); });
