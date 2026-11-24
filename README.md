@@ -7,6 +7,7 @@ Plausibilitaetspruefung fuer Ausweisfotos, gedacht fuer Unternehmen, die Kundsch
 - Aussteller-Code gegen gewaehltes Land (EU-27, Indien, Bangladesch, Pakistan, USA, Kanada, Mexiko)
 - Datumslogik: Geburt, Ablauf, Ausstellung, Gueltigkeitsdauer
 - Abgleich Sichtzone gegen MRZ (freiwillig eingetippt)
+- OCR lokal (Tesseract in vendor/): liest MRZ und Sichtzone, markiert gefundene Felder im Bild, meldet fehlende
 - Datei: Bearbeitungssoftware und KI-Kennungen, Kameradaten, Aufloesung, Schaerfe, Reflexion, Fehlerniveau-Analyse (nur JPG)
 
 ## Was nicht geprueft wird

@@ -59,7 +59,7 @@
 
     /* MRZ */
     if (mrz.problem) {
-      add("fail", "Maschinenlesbare Zone (MRZ) nicht lesbar", isPass ? "2 Zeilen mit je 44 Zeichen" : "3 Zeilen mit je 30 Zeichen", mrz.problem,
+      add(inp.fromOcr ? "warn" : "fail", "Maschinenlesbare Zone (MRZ) nicht lesbar", isPass ? "2 Zeilen mit je 44 Zeichen" : "3 Zeilen mit je 30 Zeichen", mrz.problem,
         "Ohne lesbare MRZ koennen Pruefziffern und Felder nicht abgeglichen werden. Oft liegt es an Unschaerfe, Reflexion oder abgeschnittenem Rand.",
         "Bessere Aufnahme der ganzen Seite anfordern, alle MRZ-Zeilen sichtbar, ohne Glanz.", "mrz");
     } else {
@@ -152,17 +152,61 @@
     return F;
   }
 
+  /* ---------- Abgleich MRZ <-> gelesener Text im Bild ---------- */
+  const norm = s => s.toUpperCase().replace(/ß/g, "SS").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^A-Z0-9]/g, "");
+  function lev(a, b) {
+    const m = [...Array(a.length + 1)].map((_, i) => [i]);
+    for (let j = 1; j <= b.length; j++) m[0][j] = j;
+    for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++)
+      m[i][j] = Math.min(m[i - 1][j] + 1, m[i][j - 1] + 1, m[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    return m[a.length][b.length];
+  }
+  function matchFields(f, ocr) {
+    const F = [], boxes = [];
+    const words = ocr.words.filter(w => w.text && !/</.test(w.text) && norm(w.text).length > 0 && norm(w.text).length < 20);
+    const lines = ocr.lines.filter(l => l.text && !/</.test(l.text) && norm(l.text).length < 40);
+    const findWord = t => {
+      t = norm(t); if (!t) return null; let best = null;
+      const lim = t.length >= 6 ? 1 : 0;
+      words.forEach(w => { const d = lev(norm(w.text), t); if (d <= lim && (!best || d < best.d)) best = { w, d }; });
+      return best && best.w;
+    };
+    const rec = (label, shown, hits) => {
+      if (hits && hits.length && hits.every(Boolean)) {
+        F.push({ s: "ok", t: label + " im Bild gefunden und stimmt mit der MRZ ueberein", exp: "MRZ: " + shown, got: "im Bildtext gelesen", why: "", adv: "", zone: "field" });
+        hits.forEach(w => boxes.push({ s: "ok", label: label + " ok", x0: w.bbox.x0, y0: w.bbox.y0, x1: w.bbox.x1, y1: w.bbox.y1 }));
+      } else {
+        F.push({ s: "warn", t: label + " aus der MRZ im Bild nicht gefunden", exp: "MRZ: " + shown, got: "im Bildtext nicht gefunden",
+          why: "Sichtzone und MRZ muessen dasselbe zeigen. Es kann ein Lesefehler der Texterkennung sein, aber auch eine Aenderung nur an einer Stelle.",
+          adv: "Schaerfere Aufnahme anfordern und beide Stellen von Hand vergleichen.", zone: "field" });
+      }
+    };
+    if (f.surname) rec("Nachname", f.surname, f.surname.split(" ").map(findWord));
+    if (f.given) rec("Vorname", f.given, f.given.split(" ").slice(0, 1).map(findWord));
+    if (f.docNumClean.length >= 5) rec("Dokumentnummer", f.docNumClean, [findWord(f.docNumClean)]);
+    const dateHit = d => {
+      if (!d) return null;
+      const dd = String(d.getUTCDate()).padStart(2, "0"), mm = String(d.getUTCMonth() + 1).padStart(2, "0"), yy = String(d.getUTCFullYear());
+      const pats = [dd + mm + yy, dd + mm + yy.slice(2)];
+      for (const l of lines) { const dg = l.text.replace(/\D/g, ""); if (pats.some(p => dg.includes(p))) return l; }
+      return null;
+    };
+    const dh = dateHit(f.dobDate); if (f.dobDate) rec("Geburtsdatum", fmt(f.dobDate), [dh]);
+    const eh = dateHit(f.expDate); if (f.expDate) rec("Ablaufdatum", fmt(f.expDate), [eh]);
+    return { findings: F, boxes };
+  }
+
   /* ---------- Darstellung ---------- */
   const COL = { ok: "#1fbf75", info: "#5b8def", warn: "#f0a030", fail: "#e5484d" };
   function zones(fmt) {
     const mrzH = { TD3: [0.80, 0.17], TD2: [0.74, 0.23], TD1: [0.68, 0.29] }[fmt];
     return { mrz: { x: 0.03, y: mrzH[0], w: 0.94, h: mrzH[1] }, photo: { x: 0.04, y: 0.2, w: 0.3, h: 0.45 } };
   }
-  function drawOverlay(cv, img, bmp, fmtName, findings) {
-    const W = Math.min(1000, bmp.width), H = Math.round(bmp.height * W / bmp.width);
+  function drawOverlay(cv, img, work, fmtName, findings, boxes) {
+    const W = work.width, H = work.height;
     cv.width = W; cv.height = H;
     const g = cv.getContext("2d");
-    g.drawImage(bmp, 0, 0, W, H);
+    g.drawImage(work, 0, 0);
     if (img && img.ela) { g.fillStyle = "rgba(229,72,77,.45)"; img.ela.spots.forEach(r => g.fillRect(r.x * W / img.ela.w, r.y * W / img.ela.w, r.w * W / img.ela.w, r.h * W / img.ela.w)); }
     const Z = zones(fmtName);
     const worst = z => findings.filter(f => f.zone === z).reduce((m, f) => RANK[f.s] > RANK[m] ? f.s : m, "ok");
@@ -173,6 +217,12 @@
       g.fillStyle = COL[s]; g.fillRect(r.x * W, r.y * H - 22, tw, 22);
       g.fillStyle = "#fff"; g.fillText(label, r.x * W + 6, r.y * H - 6); g.restore();
     };
+    (boxes || []).forEach(b => {
+      g.save(); g.strokeStyle = COL[b.s]; g.lineWidth = 3; g.strokeRect(b.x0, b.y0, b.x1 - b.x0, b.y1 - b.y0);
+      g.font = "bold 14px sans-serif"; const tw = g.measureText(b.label).width + 10;
+      g.fillStyle = COL[b.s]; g.fillRect(b.x0, Math.max(0, b.y0 - 20), tw, 20);
+      g.fillStyle = "#fff"; g.fillText(b.label, b.x0 + 5, Math.max(14, b.y0 - 5)); g.restore();
+    });
     box(Z.mrz, worst("mrz"), "Erwartete MRZ-Zone: " + LABEL[worst("mrz")]);
     box(Z.photo, "info", "Erwartete Fotozone (Gesicht nicht geprueft)");
   }
@@ -207,22 +257,41 @@
     $("run").disabled = true;
     try {
       const now = new Date();
-      const mrz = window.MRZ.validate(inp.mrz, now);
-      let img = null;
-      const cv = $("overlay");
+      const cv = $("overlay"), st = $("status");
+      let img = null, work = null, ocrOn = $("useocr").checked && !!state.bmp, mrzFromOcr = false;
       if (state.bmp) {
-        const W = Math.min(1000, state.bmp.width), H = Math.round(state.bmp.height * W / state.bmp.width);
-        const work = document.createElement("canvas"); work.width = W; work.height = H;
+        const W = Math.min(1400, state.bmp.width), H = Math.round(state.bmp.height * W / state.bmp.width);
+        work = document.createElement("canvas"); work.width = W; work.height = H;
         work.getContext("2d").drawImage(state.bmp, 0, 0, W, H);
+      }
+      const onStatus = (s, p) => { st.textContent = "Texterkennung: " + s + (p ? " " + Math.round(p * 100) + " %" : ""); };
+      if (ocrOn && !inp.mrz.trim()) {
+        st.textContent = "Texterkennung startet (erstes Mal bis ca. 30 Sekunden)...";
+        const nl = inp.doc === "passport" ? 2 : 3;
+        const Z0 = zones(inp.doc === "passport" ? "TD3" : "TD1");
+        inp.mrz = await window.OCR.readMrz(work, Z0.mrz, nl, onStatus);
+        $("mrz").value = inp.mrz; mrzFromOcr = !!inp.mrz; inp.fromOcr = mrzFromOcr;
+      }
+      const mrz = window.MRZ.validate(inp.mrz, now);
+      if (work) {
         img = await window.FORENSICS.analyze(work, state.buf, state.bmp.width, state.bmp.height);
-        if (img.ela) img.ela.w = W;
+        if (img.ela) img.ela.w = work.width;
       }
       const findings = evaluate(inp, mrz, img, now);
+      let boxes = [];
+      if (mrzFromOcr) findings.push({ s: "info", t: "MRZ wurde per Texterkennung gelesen", exp: "exakte Zeichen wie im Dokument", got: "OCR-Ergebnis, Lesefehler moeglich", why: "OCR verwechselt gern O/0, I/1 und das Zeichen <. Ein Lesefehler kann eine falsche Pruefziffer ausloesen.", adv: "Zeilen im Feld mit dem Original vergleichen, korrigieren und erneut pruefen.", zone: "mrz" });
+      if (ocrOn && !mrz.problem) {
+        st.textContent = "Texterkennung liest die Sichtzone...";
+        const o = await window.OCR.readText(work, onStatus);
+        const r = matchFields(mrz.fields, o);
+        r.findings.forEach(f => findings.push(f)); boxes = r.boxes;
+      }
+      st.textContent = "";
       $("result").hidden = false;
       $("metaLine").textContent = "Pruefzeit " + now.toISOString().slice(0, 16).replace("T", " ") + " UTC, Land " + (window.COUNTRIES.find(c => c.c === inp.country) || {}).n + ", " + (inp.doc === "passport" ? "Reisepass" : "ID-Karte");
       render(findings);
       cv.hidden = !state.bmp;
-      if (state.bmp) drawOverlay(cv, img, state.bmp, mrz.format || (inp.doc === "passport" ? "TD3" : "TD1"), findings);
+      if (work) drawOverlay(cv, img, work, mrz.format || (inp.doc === "passport" ? "TD3" : "TD1"), findings, boxes);
       $("result").scrollIntoView({ behavior: "smooth" });
     } catch (e) { $("err").textContent = "Fehler bei der Pruefung: " + e.message; }
     $("run").disabled = false;
