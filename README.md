@@ -30,3 +30,11 @@ Auf der Live-Seite im Browser: Knopf "App installieren" oben rechts oder Browser
 
 ## Kommandozentrum, Verlauf, Werkbank
 `index.html`: Laender links, Arbeitsflaeche rechts (Land, Verlauf, Werkzeuge). Verlauf lokal gespeichert (ohne Bilder, Namen, Ausweisnummern), CSV-Export. `vergleich.html`: Kundenbild neben amtlichem Muster (selbst hochgeladen, z. B. aus PRADO), gemeinsamer Zoom, Ueberblenden, Differenz, Kompressionskarte, Ausschnitte fuer Schriftvergleich. Das Programm erzeugt selbst keine Hologramme oder Ausweismuster.
+
+## Oberflaeche (Umbau 24.11.2026)
+- Gemeinsame Huelle fuer alle Seiten (`js/shell.js`): Kopfzeile mit Logo, Suche (Strg K oder /, Pfeiltasten, Enter; findet Laender nach Name, ISO- und MRZ-Code sowie die Bereiche), Seitenleiste links (ein- und ausklappbar auf Symbole), am Handy Tableiste unten.
+- Laender-Panel rechts auf der Startseite: ein- und ausklappbar, auf volle Breite vergroesserbar, am Handy ein Vollbild-Blatt.
+- Profil ohne Login (`js/theme.js`, Schluessel `pw_profiles`): mehrere Profile je Geraet, Name (fuellt Pruefer/in vor, wie bisher ueber `pw_who`), Rolle, Farbe, Erscheinungsbild Automatisch/Hell/Dunkel, Kontrast Automatisch/Standard/Erhoeht, Schriftgroesse, Bewegung, Seitenleiste.
+- Design-Schicht nur in `style.css` (Tokens fuer hell, dunkel und erhoehten Kontrast). Logo: `icons/zeichen.svg` (Ausweiskarte mit MRZ-Zeile, das gruene Feld ist die Pruefziffer), einfarbig `icons/zeichen-einfarbig.svg`.
+- Pruef-Logik unberuehrt: `app.js`, `mrz.js`, `forensics.js`, `ocr.js`, `vergleich.js`, `hist.js`, `countries.js` sind nicht geaendert, alle Element-IDs gleich.
+- Rueckweg: `_sicherung_vor-redesign_2026-11-24\` enthaelt die alten HTML-Seiten, `style.css`, `start.js`, `theme.js`, `pwa.js`, Icons, Manifest und `sw.js`. Zurueckkopieren, `js/shell.js` loeschen.

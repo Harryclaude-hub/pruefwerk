@@ -1,60 +1,64 @@
 <!doctype html>
-<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="robots" content="noindex">
-<title>Pruefwerk: Info, was wird geprueft</title>
-<link rel="stylesheet" href="style.css"><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0e1424"><link rel="apple-touch-icon" href="icons/icon-180.png"><script src="js/theme.js"></script><script src="js/pwa.js"></script></head><body>
-<header class="top"><a class="brand" href="index.html"><strong>Pruef<b>werk</b></strong></a><span>Info</span><nav><a href="index.html">Kommandozentrum</a><a href="vergleich.html">Vergleichs-Werkbank</a><a href="pruefen.html">Ausweis pruefen</a></nav></header>
-<main class="doc-info">
-<h1>Was wird geprueft, und wie sicher ist das?</h1>
-<p class="note">Kurz: Pruefwerk liefert einen <b>Risikohinweis mit Begruendung</b>. Eine Pruefung kann einen Fehler beweisen (zum Beispiel eine falsche Pruefziffer), aber sie kann nicht beweisen, dass ein Dokument echt ist. Wer "100 % sicher" verspricht, haftet bei jedem Fehler. Die Grenzen stehen ganz unten.</p>
-<nav class="toc"><a href="#cd">Pruefziffern</a> <a href="#mrz">MRZ und Lesesystem</a> <a href="#datum">Datumslogik</a> <a href="#land">Land und Aussteller</a> <a href="#ocr">Abgleich Bildtext</a> <a href="#bildqualitaet">Bildqualitaet</a> <a href="#datei">Dateispuren</a> <a href="#ela">Kompression</a> <a href="#doktypen">Dokumentarten</a> <a href="#nicht">Nicht geprueft</a> <a href="#recht">Recht</a></nav>
+<title>Prüfwerk: Was wird geprüft</title>
+<link rel="stylesheet" href="style.css"><link rel="manifest" href="manifest.json"><link rel="icon" href="icons/favicon.svg" type="image/svg+xml"><meta name="theme-color" content="#f5f5f7"><link rel="apple-touch-icon" href="icons/icon-180.png"><script src="js/theme.js"></script><script src="js/pwa.js"></script></head>
+<body data-page="info"><a class="skip" href="#view">Zum Inhalt springen</a>
+<header id="pw-head" class="pw-head"></header>
+<nav id="side" class="pw-side"></nav>
+<main id="view" class="pw-main page-info" tabindex="-1"><article class="doc-info">
+<h1>Was wird geprüft, und wie sicher ist das?</h1>
+<p class="note">Kurz: Prüfwerk liefert einen <b>Risikohinweis mit Begründung</b>. Eine Prüfung kann einen Fehler beweisen (zum Beispiel eine falsche Prüfziffer), aber sie kann nicht beweisen, dass ein Dokument echt ist. Wer "100 % sicher" verspricht, haftet bei jedem Fehler. Die Grenzen stehen ganz unten.</p>
+<nav class="toc"><a href="#cd">Prüfziffern</a> <a href="#mrz">MRZ und Lesesystem</a> <a href="#datum">Datumslogik</a> <a href="#land">Land und Aussteller</a> <a href="#ocr">Abgleich Bildtext</a> <a href="#bildqualitaet">Bildqualität</a> <a href="#datei">Dateispuren</a> <a href="#ela">Kompression</a> <a href="#doktypen">Dokumentarten</a> <a href="#nicht">Nicht geprüft</a> <a href="#recht">Recht</a></nav>
 
-<h2 id="cd">Pruefziffern (die "Formel unten")</h2>
-<p>Die zwei Zeilen unten auf Pass oder Karte heissen <b>MRZ</b> (maschinenlesbare Zone, Standard ICAO 9303). Wichtige Felder haben dahinter eine Pruefziffer. Sie entsteht nur aus den Zeichen des Feldes selbst, es braucht keine Versicherungs- oder Steuerdaten.</p>
-<ol><li>Jedes Zeichen bekommt einen Wert: Ziffer = ihr Wert, A bis Z = 10 bis 35, das Fuellzeichen &lt; = 0.</li>
+<h2 id="cd">Prüfziffern (die "Formel unten")</h2>
+<p>Die zwei Zeilen unten auf Pass oder Karte heißen <b>MRZ</b> (maschinenlesbare Zone, Standard ICAO 9303). Wichtige Felder haben dahinter eine Prüfziffer. Sie entsteht nur aus den Zeichen des Feldes selbst, es braucht keine Versicherungs- oder Steuerdaten.</p>
+<ol><li>Jedes Zeichen bekommt einen Wert: Ziffer = ihr Wert, A bis Z = 10 bis 35, das Füllzeichen &lt; = 0.</li>
 <li>Die Werte werden der Reihe nach mit 7, 3, 1, 7, 3, 1 ... multipliziert.</li>
-<li>Alles wird addiert, der Rest durch 10 ist die Pruefziffer.</li></ol>
-<p>Beispiel (offizielles ICAO-Muster): Geburtsdatum <b>740812</b>: 7x7 + 4x3 + 0x1 + 8x7 + 1x3 + 2x1 = 49+12+0+56+3+2 = 122, Rest 2, also steht dahinter die <b>2</b>. Wer ein Feld nachtraeglich aendert und die Ziffer nicht neu berechnet, faellt auf. Es gibt Pruefziffern fuer Dokumentnummer, Geburtsdatum, Ablaufdatum, das Zusatzfeld und eine Gesamt-Pruefziffer ueber alle. <b>Eine falsche Ziffer bei klarem Bild ist einer der staerksten Hinweise.</b> Wer die Formel kennt, kann sie aber auch korrekt berechnen: eine richtige Ziffer beweist nichts.</p>
+<li>Alles wird addiert, der Rest durch 10 ist die Prüfziffer.</li></ol>
+<p>Beispiel (offizielles ICAO-Muster): Geburtsdatum <b>740812</b>: 7x7 + 4x3 + 0x1 + 8x7 + 1x3 + 2x1 = 49+12+0+56+3+2 = 122, Rest 2, also steht dahinter die <b>2</b>. Wer ein Feld nachträglich ändert und die Ziffer nicht neu berechnet, fällt auf. Es gibt Prüfziffern für Dokumentnummer, Geburtsdatum, Ablaufdatum, das Zusatzfeld und eine Gesamt-Prüfziffer über alle. <b>Eine falsche Ziffer bei klarem Bild ist einer der stärksten Hinweise.</b> Wer die Formel kennt, kann sie aber auch korrekt berechnen: eine richtige Ziffer beweist nichts.</p>
 
 <h2 id="mrz">MRZ und Lesesystem</h2>
-<p>Die MRZ nutzt nur A bis Z, 0 bis 9 und &lt;. Formate: <b>TD3</b> Reisepass (2 Zeilen x 44 Zeichen), <b>TD1</b> ID-Karte (3 x 30), <b>TD2</b> (2 x 36), Visum <b>Typ A</b> (2 x 44) und <b>Typ B</b> (2 x 36), erkennbar am ersten Buchstaben V. Gedruckt wird in der Schrift OCR-B. Pruefwerk liest die Zeilen per Texterkennung (lokal) oder du tippst sie ein. Die Texterkennung verwechselt gern O und 0, I und 1 sowie das Zeichen &lt;. Darum steht ein OCR-Ergebnis immer als Entwurf im Feld, den du mit dem Original vergleichst.</p>
+<p>Die MRZ nutzt nur A bis Z, 0 bis 9 und &lt;. Formate: <b>TD3</b> Reisepass (2 Zeilen x 44 Zeichen), <b>TD1</b> ID-Karte (3 x 30), <b>TD2</b> (2 x 36), Visum <b>Typ A</b> (2 x 44) und <b>Typ B</b> (2 x 36), erkennbar am ersten Buchstaben V. Gedruckt wird in der Schrift OCR-B. Prüfwerk liest die Zeilen per Texterkennung (lokal) oder du tippst sie ein. Die Texterkennung verwechselt gern O und 0, I und 1 sowie das Zeichen &lt;. Darum steht ein OCR-Ergebnis immer als Entwurf im Feld, den du mit dem Original vergleichst.</p>
 
 <h2 id="datum">Datumslogik</h2>
 <ul><li>Geburtsdatum muss ein reales Datum sein, nicht in der Zukunft, Alter unter 115.</li>
-<li>Abgelaufen heisst ungueltig. Unter 6 Monaten Restlaufzeit gibt es einen Hinweis (viele Anbieter verlangen das).</li>
+<li>Abgelaufen heißt ungültig. Unter 6 Monaten Restlaufzeit gibt es einen Hinweis (viele Anbieter verlangen das).</li>
 <li>Ausstellung muss vor dem Ablauf und nach der Geburt liegen.</li>
-<li>Reisepaesse gelten fuer Erwachsene in der Regel hoechstens 10 Jahre. Mehr ist ungewoehnlich (aeltere Modelle koennen abweichen).</li>
-<li>Welche alten Passmodelle ein Land fuer ungueltig erklaert hat, steht nicht im Programm. Das traegt man nur aus amtlichen Quellen ein, nicht aus dem Gedaechtnis, sonst werden echte Kunden abgelehnt.</li></ul>
+<li>Reisepässe gelten für Erwachsene in der Regel höchstens 10 Jahre. Mehr ist ungewöhnlich (ältere Modelle können abweichen).</li>
+<li>Welche alten Passmodelle ein Land für ungültig erklärt hat, steht nicht im Programm. Das trägt man nur aus amtlichen Quellen ein, nicht aus dem Gedächtnis, sonst werden echte Kunden abgelehnt.</li></ul>
 
 <h2 id="land">Land und Aussteller</h2>
-<p>Die MRZ nennt den ausstellenden Staat mit einem Dreibuchstaben-Code (ISO 3166, Deutschland ist <b>D</b>, Kosovo <b>RKS</b>). Er muss zum gewaehlten Land passen. Bei Reisepaessen ist die Staatsangehoerigkeit meist gleich.</p>
+<p>Die MRZ nennt den ausstellenden Staat mit einem Dreibuchstaben-Code (ISO 3166, Deutschland ist <b>D</b>, Kosovo <b>RKS</b>). Er muss zum gewählten Land passen. Bei Reisepässen ist die Staatsangehörigkeit meist gleich.</p>
 
 <h2 id="ocr">Abgleich Bildtext und MRZ</h2>
-<p>Namen, Dokumentnummer, Geburts- und Ablaufdatum aus der MRZ werden im Foto gesucht und gruen markiert. Wird ein Feld nicht gefunden, ist das nur ein Pruefhinweis, denn auch Lesefehler sind moeglich. Eine echte Abweichung zwischen Sichtzone und MRZ (vom Menschen eingetippte Werte) ist dagegen auffaellig.</p>
+<p>Namen, Dokumentnummer, Geburts- und Ablaufdatum aus der MRZ werden im Foto gesucht und grün markiert. Wird ein Feld nicht gefunden, ist das nur ein Prüfhinweis, denn auch Lesefehler sind möglich. Eine echte Abweichung zwischen Sichtzone und MRZ (vom Menschen eingetippte Werte) ist dagegen auffällig.</p>
 
-<h2 id="bildqualitaet">Bildqualitaet</h2>
-<p>Aufloesung (mind. 800 Pixel Breite), Schaerfe, Reflexion und Helligkeit. Schlechte Qualitaet beweist keine Faelschung, aber ohne klares Bild kann man nichts beurteilen. Dann: bessere Aufnahme oder ein zweites Dokument anfordern.</p>
+<h2 id="bildqualitaet">Bildqualität</h2>
+<p>Auflösung (mind. 800 Pixel Breite), Schärfe, Reflexion und Helligkeit. Schlechte Qualität beweist keine Fälschung, aber ohne klares Bild kann man nichts beurteilen. Dann: bessere Aufnahme oder ein zweites Dokument anfordern.</p>
 
 <h2 id="datei">Dateispuren</h2>
-<p>Gelesen werden Kamera-Daten (EXIF), Bearbeitungsprogramme (zum Beispiel Photoshop, GIMP) und Kennungen von KI-Werkzeugen. Fehlende Kameradaten sind haeufig (Screenshots, Messenger). Bearbeitungssoftware ist ein Hinweis, kein Beweis: manche Scan-Apps nutzen sie. KI-Kennungen in der Datei sind ein starker Hinweis, doch sie lassen sich entfernen, ihr Fehlen beweist nichts.</p>
+<p>Gelesen werden Kamera-Daten (EXIF), Bearbeitungsprogramme (zum Beispiel Photoshop, GIMP) und Kennungen von KI-Werkzeugen. Fehlende Kameradaten sind häufig (Screenshots, Messenger). Bearbeitungssoftware ist ein Hinweis, kein Beweis: manche Scan-Apps nutzen sie. KI-Kennungen in der Datei sind ein starker Hinweis, doch sie lassen sich entfernen, ihr Fehlen beweist nichts.</p>
 
 <h2 id="ela">Kompression (Fehlerniveau-Analyse)</h2>
-<p>Das Bild wird neu gespeichert und mit dem Original verglichen. Stellen, die nachtraeglich eingefuegt wurden, verhalten sich oft anders und werden rot markiert. Gilt nur fuer JPG. Fotos von Papier und starke Nachbearbeitung durch Messenger koennen dasselbe Muster zeigen, also nur zusammen mit anderen Hinweisen werten.</p>
+<p>Das Bild wird neu gespeichert und mit dem Original verglichen. Stellen, die nachträglich eingefügt wurden, verhalten sich oft anders und werden rot markiert. Gilt nur für JPG. Fotos von Papier und starke Nachbearbeitung durch Messenger können dasselbe Muster zeigen, also nur zusammen mit anderen Hinweisen werten.</p>
 
 <h2 id="doktypen">Dokumentarten</h2>
-<ul><li><b>Reisepass, ID-Karte, Aufenthaltstitel, Visum:</b> mit MRZ und Pruefziffern.</li>
-<li><b>Fuehrerschein:</b> keine standardisierte MRZ. Nur Datumslogik und Bildhinweise, dazu ein zweites Dokument anfordern.</li>
-<li>Einige Laender (zum Beispiel Indien, Bangladesch, Pakistan, Kanada, Mexiko, Daenemark, Irland) stellen keine nationale ID-Karte mit MRZ aus. Dann ist der Reisepass der verlaesslichere Nachweis.</li></ul>
+<ul><li><b>Reisepass, ID-Karte, Aufenthaltstitel, Visum:</b> mit MRZ und Prüfziffern.</li>
+<li><b>Führerschein:</b> keine standardisierte MRZ. Nur Datumslogik und Bildhinweise, dazu ein zweites Dokument anfordern.</li>
+<li>Einige Länder (zum Beispiel Indien, Bangladesch, Pakistan, Kanada, Mexiko, Dänemark, Irland) stellen keine nationale ID-Karte mit MRZ aus. Dann ist der Reisepass der verlässlichere Nachweis.</li></ul>
 
-<h2 id="nicht">Was nicht geprueft wird</h2>
-<ul><li><b>Gesicht:</b> der Abgleich mit der Person braucht ein Selfie mit Lebenderkennung und ein geprueftes Gesichtsmodell.</li>
+<h2 id="nicht">Was nicht geprüft wird</h2>
+<ul><li><b>Gesicht:</b> der Abgleich mit der Person braucht ein Selfie mit Lebenderkennung und ein geprüftes Gesichtsmodell.</li>
 <li><b>Unterschrift:</b> es fehlt ein Vergleichsmuster.</li>
-<li><b>Hologramme und andere Sicherheitsmerkmale:</b> auf einem Foto kaum beurteilbar, sie aendern sich mit dem Blickwinkel und Licht.</li>
-<li><b>NFC-Chip und amtliche Register:</b> das ist die staerkste Pruefung bei neuen Paessen und Karten und braucht Apps und Partner.</li>
+<li><b>Hologramme und andere Sicherheitsmerkmale:</b> auf einem Foto kaum beurteilbar, sie ändern sich mit dem Blickwinkel und Licht.</li>
+<li><b>NFC-Chip und amtliche Register:</b> das ist die stärkste Prüfung bei neuen Pässen und Karten und braucht Apps und Partner.</li>
 <li><b>Layout je Land:</b> Vergleich mit amtlichen Mustern (PRADO), dazu gibt es hier keine Nachbauten.</li></ul>
-<p>Fuer den kommerziellen Einsatz bei Banken oder Casinos erwarten Aufsicht und Pruefstellen eine zertifizierte Loesung (zum Beispiel Lebenderkennung nach ISO 30107-3). Pruefwerk ist eine solide Vorpruefung, ersetzt das aber nicht.</p>
+<p>Für den kommerziellen Einsatz bei Banken oder Casinos erwarten Aufsicht und Prüfstellen eine zertifizierte Lösung (zum Beispiel Lebenderkennung nach ISO 30107-3). Prüfwerk ist eine solide Vorprüfung, ersetzt das aber nicht.</p>
 
 <h2 id="recht">Recht und Datenschutz</h2>
-<p>Ausweisfotos und Gesichter sind besonders geschuetzte Daten (DSGVO Art. 9). Fuer den echten Betrieb brauchst du eine Rechtsgrundlage, Auftragsverarbeitungsvertraege, EU-Hosting und Loeschfristen. Der Bericht gehoert nur der pruefenden Firma, nicht der geprueften Person.</p>
-</main></body></html>
+<p>Ausweisfotos und Gesichter sind besonders geschützte Daten (DSGVO Art. 9). Für den echten Betrieb brauchst du eine Rechtsgrundlage, Auftragsverarbeitungsverträge, EU-Hosting und Löschfristen. Der Bericht gehört nur der prüfenden Firma, nicht der geprüften Person.</p>
+</article></main>
+<script src="js/countries.js"></script><script src="js/shell.js"></script>
+</body></html>

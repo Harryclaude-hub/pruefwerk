@@ -1,0 +1,4 @@
+# Nur lokal, nie auf GitHub
+.claude/
+_sicherung_*/
+lokal/
